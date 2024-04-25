@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <climits>
 
 // create a dp table class to store the choices & max pairs possible
 struct Table
@@ -11,7 +12,7 @@ struct Table
 
     // constructor
     Table(int size) 
-        : table(size + 1, std :: vector <int> (size + 1, 0)) {}
+        : table(size + 1, std :: vector <int> (size + 1, 0)) { }
 
     // value manipulation overloading
     int& operator() (int i, int j) { return table[i][j]; }
@@ -26,49 +27,47 @@ struct Table
 // check pairing between two string indices
 bool RNApairing(const std :: string& RNA, int i, int j)
 {
-    if (RNA[i] == 'A' && RNA[j] == 'U')
-        return true;
+    if (RNA[i] == 'A' && RNA[j] == 'U') { return true; }
     
-    else if (RNA[i] == 'U' && RNA[j] == 'A')
-        return true;
+    else if (RNA[i] == 'U' && RNA[j] == 'A') { return true; }
 
-    else if (RNA[i] == 'G' && RNA[j] == 'C')
-        return true;
+    else if (RNA[i] == 'G' && RNA[j] == 'C') { return true; }
 
-    else if (RNA[i] == 'C' && RNA[j] == 'G')
-        return true;
+    else if (RNA[i] == 'C' && RNA[j] == 'G') { return true; }
 
-    else
-        return false;
+    else { return  false; }
 }
 
 // RNA folding dp algorithm
 int RNAfolding(const std :: string& RNA, Table& optValue, Table& optChoice)
 {
-    for (size_t k = 5; k <= RNA.size(); k++)
+    for (size_t k = 5; k <= RNA.size() - 1; k++)
     {
-        for (size_t i = 1; i <= RNA.size() - k; i++)
+        for (size_t i = 0; i < RNA.size() - k; i++)
         {
             size_t j = i + k;
-            if (i < j - 4)
+            int max = INT_MIN;
+            int first = optValue(i, j-1);
+            for(size_t t = i; t <= j - 5; t++)
             {
-                size_t t;
-                int max = INT_MIN;
-                for(t = i; t < j - 4; t++)
+                if (RNApairing(RNA, t, j) || RNApairing(RNA, j, t))
                 {
-                    if (RNApairing(RNA, t + 1, j))
-                    {
-                        int pairs = optValue(i, t - 1) + optValue(t + 1, j - 1) + 1;
-                        max = std :: max(max, pairs);
+                    if(1 + optValue(i, t - 1) + optValue(t + 1, j - 1) > max){
+                        max = 1 + optValue(i, t - 1) + optValue(t + 1, j - 1);
                     }
                 }
+            }
 
-                optValue(i, j) = std :: max(optValue(i, j - 1), max);
-            } 
+            if(max > first){
+                optValue(i, j) = max;
+            } else {
+                optValue(i, j) = first;
+            }
+             
         }
     }
-
-    return optValue(1, RNA.size());
+    
+    return optValue(0, RNA.size()-1);
 }
 
 // get secondary structure based on the optChoice
@@ -95,6 +94,12 @@ int main()
     // std :: vector <std :: pair <int, int>> secondaryStruct = getSecondaryStruct(optChoice, RNA);
     // print the max pairs and secondary struct
     std :: cout << "Optimal base pairs: " << max_pairs << std :: endl;
+    for (int i = 0; i < optValue.size(); i++)
+    {
+        for (int j = 0; j < optValue.size(); j++)
+            std :: cout << optValue(i, j) << " ";
+        std :: cout << std :: endl;
+    }
     // std :: cout << "Secondary structure: ";
 
     // for (auto it : secondaryStruct)
