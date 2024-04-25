@@ -36,6 +36,7 @@ int main() {
             std::cout << "(" << pair.first << ", " << pair.second << ") ";
         }
         std::cout << "\n";
+        std::cout << "\n";
     }
 
     return 0;
