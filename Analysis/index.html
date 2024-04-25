@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorithm Analysis</title>
+</head>
+<body>
+    <h1>RNA Folding problem</h1>
+    <p>This is a famous problem in biology where one needs to predict the most
+        optimal secondary structures of mRNA molecule. This can be acheieved by maximising
+        the count of base-pairs (Adenine with Uracil or Guanine with Cytosine) while ensuring
+        there are no knots and kinks in the final pairing. The hypotheses is that making
+        many base pairs will reduce the free energy of the molecule and hence make it much
+        more stable and liklely to actually exist (some anomalies can exist tho).
+    </p>
+    <h2>Demonstration</h2>
+    <img src="./demonstrate.png">
+    <p>Let's run the algorithm step-by-step on a RNA molecule. Condsider an RNA molecule can be represented as a string as RNA = GAAGGAGUCGUUCAU 
+        with the length of n = 15 nucleotides. Now this problem will involve dynamic programming as we are supposed to find the optimal structure 
+        by maximising the number of base-pairs while ensuring its knot & kink free.
+    </p>
+    <h3>What are knots/kinks?</h3>
+    <p>Knots/kinks are created in molecules when the two adjacent nucleotides make a pair, this will make the bonds
+        to constrained and hence increase the free energy. Now to ensure that pairs have sufficent space to form bonds 
+        with each other, two adjacent nucleotides which can form a pair must have minimum 4 bases between them.
+    </p>
+    <h3>Programming Formulation</h3>
+    <p>We are dealing with chemical molecules so it would be great if we can build a programming representation for 
+        molecules so that they can be easily manipulated by algorithms.
+    </p>
+    <p>RNA molecule can be represented as a c++ string from set {A, U, G, C}</p>
+    <code>
+        std :: string RNA = "GAAGGAGUCGUUCAU";
+    </code>
+    <p>The output secondary structure can be represented as an ordering of compatible base-pairs</p>
+    <code>
+        std::vector&lt;std::pair&lt;int, int&gt;&gt; secondaryStruct = {(..., ...)};
+    </code>
+    <p>As we discussed above elements in a pair should be compatible (A with U or G with C),
+        for this a boolean function can be built which can compare bases at the required indexes
+        in the RNA string and tell us if they can be paired.
+    </p>
+    <code>
+        bool RNApairing(const std::string& RNA, int i, int j);
+    </code>
+    <p>Finally, to avoid the knot situation, we will make sure that the pairing elements in our
+        secondary structure need to be more than 4 indexes apart. Programmatically, we will evaluate
+        all those cases only where indexes follow the above condition.
+    </p>
+    <code>
+        optValue(i, j) = 0 // if i >= j - 4
+    </code>
+    <h3>Defining Problem</h3>
+    <p>Now, we are ready to formulate our problem. We are given an RNA molecule <code>"GAAGGAGUCGUUCAU"</code>, we
+        will define two table classes <code>optValue(RNA.size())</code> (to get optimal count of base-pairs) and <code>optChoice(RNA.size())</code>
+        (to get the pairs which actually were present in the base-pair construction). We want the ordering which
+        following all constraints gives the maximum no. of pairs.
+    </p>
+    <h3>Defining Recurrence</h3>
+    <p>This is a crucial part of DP algorithm, this can then be converted to bottom-up approach using Tables later.. 
+        we will fill the <code>optValue(n)</code> and <code>optChoice(n)</code> table using following conditions, although its not
+        recurrence as intended in title, the operations are derived from it.
+    </p>
+    <ol>
+        <li>
+            <b>Base Case:</b>
+            <p>Now due to knot condition, our both the tables should have '0':</p>
+            <code>
+                optValue(i, j) = 0;
+                optChoice(i, j) = 0;
+                iff i >= j - 4;
+            </code>
+        </li>
+        <li>
+            <b>Recursive/Iterative case</b>
+            <p>Here, we have further two cases:</p>
+            <ol>
+                <li>
+                    <b>if i & j are pairable</b>
+                    <p>consider all those indices 't' such that j and t pair and <code>j &lt; t - 4</code>, we 
+                        will get two sub-problems for our <code>optValue(i, j)</code>, one being <code>optValue(i, t - 1)</code>
+                        and other being <code>optValue(t + 1, j - 1)</code>, thus we iterate over all possible t's and find maximum 
+                        value of : <code>optValue(i, t - 1) + optValue(t + 1, j - 1) + 1</code>
+                        As for <code>optChoice(i, j)</code>, we just fill the maximum 't' we found which made pair with our 'j'.
+                    </p>
+                </li>
+                <li>
+                    <b>if i & j are not pairable</b>
+                    <p>When this occurs, simply put:</p>
+                    <code>optValue(i, j) = optValue(i, j - 1);</code>
+                    <p>and for choice table, we will make it 0</p>
+                    <code>optChoice(i, j) = 0;</code>
+                </li>
+            </ol>
+            <p>For <code>optValue(i, j)</code> we get maxima of the two above values possible and equate it to <code>optValue(i, j)</code></p>
+        </li>
+    </ol>
+    <h3>Final algorithms</h3>
+    <ol>
+        <li>
+            <h4>Optimal Pair calculation</h4>
+            <p>Below is the pseudo-code implemented to fill the choice and value tables</p>
+            <code>
+                <pre>
+                Intialise optChoice(i,j) = optValue(i, j) = 0
+                for k = 5, 6, ....., n - 1:
+                    For i = 0, 1, 2, ...., n - k: // 0-based indexing
+                        set j = i + k;
+                        compute optChoice(i, j) & optValue(i, j) using above rules
+                    Endfor
+                Endfor
+                return optChoice & optValue tables!
+                </pre>
+            </code>
+        </li>
+        <li>
+            <h4>Base-pair construction</h4>
+            <code>
+                <pre>
+                    getStruct(i, j, output):
+                        Take the pre-filled optChoice(i, j)
+                        Base case:
+                            if i >= j - 4, then:
+                                // don't do anything
+                        Endfor
+                        
+                        Recursive case:
+                            if the optChoice(i, j) != 0: // a 't' exists which can form pair 
+                                output.emplace(pair(t,j))
+                                getStruct(i, t - 1, output)
+                                getStruct(t + 1, j - 1, output)
+                            else:
+                                getStruct(i, j - 1, output)
+                        Endfor
+                    return output
+                </pre>
+            </code>
+        </li>
+    </ol>
+    <b>Appropriate memoization have been done for both the algorithms (dp & backtracking one) to optimize running time!</b>
+    <h3>Final output</h3>
+    <p>After running the algorithms, we finally get our optimal ordering of base-pairs as:</p>
+    <code><b>S= {(1,13), (2,12), (3,11), (4,9)}</b></code>
+    <h3>Complexity Analysis</h3>
+    <h4>Optimal base pair Algorithm</h4>
+    <ol>
+        <li>Initalizing both the tables with 0's takes <b>O(n<sup>2</sup>)</b> running time.</li>
+        <li>Iterating over <b>k</b> and <b>i</b> to cover all possible cells takes <b>O(n<sup>2</sup>)</b> running time.</li>
+        <li>But inside, there is a condition in which we might need to re-iterate <b>t</b> over <b>i</b> and <b>j - 4</b> which will take <b>O(n)</b> running time.</li>
+        <li>Hence, in the end we will get over all <b>O(n<sup>2</sup>) + O(n<sup>2</sup>) * O(n) ~ O(n<sup>3</sup>)</b></li>
+    </ol>
+    <p>Hence the running time for this algo is <b>O(n<sup>3</sup>)</b></p>
+    <h4>Base pair construction Algorithm</h4>
+    <p>Without memoization the algorithm will have <b>O(2<sup>n</sup>)</b> complexity, but memoizing it
+            makes the function call itself only on distinct pairs of <b>(i, j)</b>, hence in worst case it will 
+            go over all unique combinations of <b>(i, j)</b> which will make complexity quadratic as <b>O(n<sup>2</sup>)</b>
+    </p>
+</body>
+</html>
