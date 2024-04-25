@@ -1,3 +1,11 @@
+/**
+ * @file rna_folding.h
+ * @brief This file contains the declarations for the RNA folding problem.
+ * 
+ * This file includes the declarations of the functions and classes used to solve the RNA folding problem using dynamic programming.
+ * The definitions for these functions and classes are provided in rna_folding.cpp.
+ * 
+ */
 #ifndef RNA_FOLDING_H
 #define RNA_FOLDING_H
 
@@ -5,49 +13,83 @@
 #include <string>
 #include <map>
 
-// create a dp table class to store the choices & max pairs possible
+/**
+ * @brief Dynamic Programming table to store the choices & max pairs possible.
+ */
 struct Table
 {
-    // container
-    std :: vector <std :: vector <int>> table;
+    std::vector<std::vector<int>> table; ///< Container for the table.
 
-    // constructor
-    Table(int size) 
-        : table(size, std :: vector <int> (size, 0)) { }
+    /**
+     * @brief Constructor that initializes the table with zeros.
+     * @param size The size of the table.
+     */
+    Table(int size) : table(size, std::vector<int>(size, 0)) {}
 
-    // value manipulation overloading
-    int& operator() (int i, int j) { return table[i][j]; }
+    /**
+     * @brief Overloaded operator() to manipulate values in the table.
+     * @param i The row index.
+     * @param j The column index.
+     * @return Reference to the table element at (i, j).
+     */
+    int& operator()(int i, int j) { return table[i][j]; }
 
-    // value retrieval overloading
-    const int& operator() (int i, int j) const { return table[i][j]; }
+    /**
+     * @brief Overloaded operator() to retrieve values from the table.
+     * @param i The row index.
+     * @param j The column index.
+     * @return The table element at (i, j).
+     */
+    const int& operator()(int i, int j) const { return table[i][j]; }
 
-    // return size of the table
+    /**
+     * @brief Returns the size of the table.
+     * @return The size of the table.
+     */
     size_t size() const { return table.size(); }
 };
 
-
-// creating base-pair class to help in memoization
+/**
+ * @brief Class to help in memoization of base-pair structures.
+ */
 class BasePair
 {
-    private:
-        std :: map <std :: pair <int, int>, std :: vector <std :: pair <int, int>>> memo;
+private:
+    std::map <std::pair <int, int>, std::vector <std::pair <int, int>>> memo; ///< Container for memoized results.
 
-    public:
-        // Constructor
-        BasePair() { }
+public:
+    /**
+     * @brief Constructor.
+     */
+    BasePair() {}
 
-        // function to check if result is memoized
-        bool contains(int i, int j) const { return memo.find({i, j}) != memo.end(); }
+    /**
+     * @brief Checks if a result is memoized.
+     * @param i The start index of the RNA sequence.
+     * @param j The end index of the RNA sequence.
+     * @return True if the result is memoized, false otherwise.
+     */
+    bool contains(int i, int j) const { return memo.find({i, j}) != memo.end(); }
 
-        // function to get cached result
-        std :: vector <std :: pair <int, int>>& get(int i, int j) { return memo[{i, j}]; }
+    /**
+     * @brief Retrieves a cached result.
+     * @param i The start index of the RNA sequence.
+     * @param j The end index of the RNA sequence.
+     * @return The cached result for the RNA sequence from i to j.
+     */
+    std::vector <std::pair <int, int>>& get(int i, int j) { return memo[{i, j}]; }
 
-        // function to store computed result
-        void store(int i, int j, const std :: vector <std :: pair <int, int>>& result) { memo[{i, j}] = result; }
+    /**
+     * @brief Stores a computed result.
+     * @param i The start index of the RNA sequence.
+     * @param j The end index of the RNA sequence.
+     * @param result The computed result for the RNA sequence from i to j.
+     */
+    void store(int i, int j, const std::vector <std::pair <int, int>>& result) { memo[{i, j}] = result; }
 };
 
-bool RNApairing(const std::string& RNA, int i, int j);
-int RNAfolding(const std::string& RNA, Table& optValue, Table& optChoice);
-void getSecondaryStruct(const Table& optChoice, int i, int j, const std::string& RNA, std::vector<std::pair<int, int>>& basePairs, BasePair& memo);
+bool RNApairing(const std::string& RNA, int i, int j); ///< Checks if the bases at positions i and j can form a pair.
+int RNAfolding(const std::string& RNA, Table& optValue, Table& optChoice); ///< Computes the optimal secondary structure of the RNA sequence.
+void getSecondaryStruct(const Table& optChoice, int i, int j, const std::string& RNA, std::vector<std::pair<int, int>>& basePairs, BasePair& memo); ///< Retrieves the base-pair structure for the optimal secondary structure.
 
 #endif // RNA_FOLDING_H

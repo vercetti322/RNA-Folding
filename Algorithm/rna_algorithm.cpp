@@ -1,3 +1,12 @@
+/**
+ * @file rna_algorithm.cpp
+ * @brief This file contains the definitions for the RNA folding problem.
+ * 
+ * This file includes the implementation of the functions declared in rna_folding.h.
+ * These functions are used to solve the RNA folding problem using dynamic programming.
+ * 
+ * @see rna_folding.h
+ */
 #include <iostream>
 #include <vector>
 #include <string>
@@ -6,22 +15,30 @@
 #include <map>
 #include "rna_folding.h"
 
-// check pairing between two string indices
-bool RNApairing(const std :: string& RNA, int i, int j)
+/**
+ * @brief Checks if the bases at positions i and j can form a pair.
+ * @param RNA The RNA sequence.
+ * @param i The start index of the RNA sequence.
+ * @param j The end index of the RNA sequence.
+ * @return True if the bases at positions i and j can form a pair, false otherwise.
+ */
+bool RNApairing(const std::string& RNA, int i, int j)
 {
     if (RNA[i] == 'A' && RNA[j] == 'U') { return true; }
-    
     else if (RNA[i] == 'U' && RNA[j] == 'A') { return true; }
-
     else if (RNA[i] == 'G' && RNA[j] == 'C') { return true; }
-
     else if (RNA[i] == 'C' && RNA[j] == 'G') { return true; }
-
     else { return  false; }
 }
 
-// RNA folding dp algorithm
-int RNAfolding(const std :: string& RNA, Table& optValue, Table& optChoice)
+/**
+ * @brief Computes the optimal secondary structure of the RNA sequence using dynamic programming.
+ * @param RNA The RNA sequence.
+ * @param optValue The dynamic programming table for optimal values.
+ * @param optChoice The dynamic programming table for optimal choices.
+ * @return The optimal value for the entire RNA sequence.
+ */
+int RNAfolding(const std::string& RNA, Table& optValue, Table& optChoice)
 {
     for (size_t k = 5; k <= RNA.size() - 1; k++)
     {
@@ -48,77 +65,45 @@ int RNAfolding(const std :: string& RNA, Table& optValue, Table& optChoice)
                 optValue(i, j) = max;
                 optChoice(i, j) = choice + 1;
             } 
-            
             else 
             {
                 optValue(i, j) = first;
             }
-             
         }
     }
     
     return optValue(0, RNA.size()-1);
 }
 
+/**
+ * @brief Retrieves the base-pair structure for the optimal secondary structure.
+ * @param optChoice The dynamic programming table for optimal choices.
+ * @param i The start index of the RNA sequence.
+ * @param j The end index of the RNA sequence.
+ * @param RNA The RNA sequence.
+ * @param basePairs The vector to store the base-pair structure.
+ * @param memo The BasePair object for memoization.
+ */
 void getSecondaryStruct(const Table& optChoice, int i, int j, const std::string& RNA, std::vector<std::pair<int, int>>& basePairs, BasePair& memo) {
-    // if problem is too small
     if (i >= j - 4)
         return;
 
-    // check if result is memoized
     if (memo.contains(i, j)) {
         basePairs = memo.get(i, j);
         return;
     }
     
-    // check if pairing exists at current position
     int t = optChoice(i, j) - 1;
     if (RNApairing(RNA, t, j))
     {
-        // add the pair to basePairs
-        basePairs.emplace_back(t + 1, j + 1); // because of 0-based indexing
-
-        // check for left and right ranges
+        basePairs.emplace_back(t + 1, j + 1);
         getSecondaryStruct(optChoice, i, t - 1, RNA, basePairs, memo);
         getSecondaryStruct(optChoice, t + 1, j - 1, RNA, basePairs, memo);
     }
-
     else
     {
         getSecondaryStruct(optChoice, i, j - 1, RNA, basePairs, memo);
     }
 
-    // store computed result
     memo.store(i, j, basePairs);
 }
-
-
-
-// int main()
-// {
-//     // take RNA input
-//     std :: string RNA;
-//     std :: cin >> RNA;
-
-//     // make the memo table references
-//     int size = RNA.size();
-//     Table optValue(size);
-//     Table optChoice(size);
-
-//     // now pass into the dp code for getting secondary structure & max-base pairs
-//     int max_pairs = RNAfolding(RNA, optValue, optChoice);
-
-//     // get the secondary structure from the optChoice table
-//     BasePair memo;
-//     std :: vector <std :: pair <int, int>> basePairs;
-//     getSecondaryStruct(optChoice, 0, RNA.size() - 1, RNA, basePairs, memo);
-
-//     // print the max pairs and secondary struct
-//     std :: cout << "Secondary structure: {";
-//     for (auto it : basePairs)
-//     {
-//         std :: cout << '(' << it.first << ',' << it.second << "),";
-//     }
-
-//     std :: cout << '}' << std :: endl;
-// }
