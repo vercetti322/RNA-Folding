@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <climits>
 #include <map>
+#include <rna_folding.h>
 
 // create a dp table class to store the choices & max pairs possible
 struct Table
