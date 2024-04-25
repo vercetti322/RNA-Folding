@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 
 // create a dp table class to store the choices & max pairs possible
 struct Table

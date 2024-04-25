@@ -4,48 +4,7 @@
 #include <algorithm>
 #include <climits>
 #include <map>
-#include <rna_folding.h>
-
-// create a dp table class to store the choices & max pairs possible
-struct Table
-{
-    // container
-    std :: vector <std :: vector <int>> table;
-
-    // constructor
-    Table(int size) 
-        : table(size, std :: vector <int> (size, 0)) { }
-
-    // value manipulation overloading
-    int& operator() (int i, int j) { return table[i][j]; }
-
-    // value retrieval overloading
-    const int& operator() (int i, int j) const { return table[i][j]; }
-
-    // return size of the table
-    size_t size() const { return table.size(); }
-};
-
-// creating base-pair class to help in memoization
-class BasePair
-{
-    private:
-        std :: map <std :: pair <int, int>, std :: vector <std :: pair <int, int>>> memo;
-
-    public:
-        // Constructor
-        BasePair() { }
-
-        // function to check if result is memoized
-        bool contains(int i, int j) const { return memo.find({i, j}) != memo.end(); }
-
-        // function to get cached result
-        std :: vector <std :: pair <int, int>>& get(int i, int j) { return memo[{i, j}]; }
-
-        // function to store computed result
-        void store(int i, int j, const std :: vector <std :: pair <int, int>>& result) { memo[{i, j}] = result; }
-};
-
+#include "rna_folding.h"
 
 // check pairing between two string indices
 bool RNApairing(const std :: string& RNA, int i, int j)
@@ -135,31 +94,31 @@ void getSecondaryStruct(const Table& optChoice, int i, int j, const std::string&
 
 
 
-int main()
-{
-    // take RNA input
-    std :: string RNA;
-    std :: cin >> RNA;
+// int main()
+// {
+//     // take RNA input
+//     std :: string RNA;
+//     std :: cin >> RNA;
 
-    // make the memo table references
-    int size = RNA.size();
-    Table optValue(size);
-    Table optChoice(size);
+//     // make the memo table references
+//     int size = RNA.size();
+//     Table optValue(size);
+//     Table optChoice(size);
 
-    // now pass into the dp code for getting secondary structure & max-base pairs
-    int max_pairs = RNAfolding(RNA, optValue, optChoice);
+//     // now pass into the dp code for getting secondary structure & max-base pairs
+//     int max_pairs = RNAfolding(RNA, optValue, optChoice);
 
-    // get the secondary structure from the optChoice table
-    BasePair memo;
-    std :: vector <std :: pair <int, int>> basePairs;
-    getSecondaryStruct(optChoice, 0, RNA.size() - 1, RNA, basePairs, memo);
+//     // get the secondary structure from the optChoice table
+//     BasePair memo;
+//     std :: vector <std :: pair <int, int>> basePairs;
+//     getSecondaryStruct(optChoice, 0, RNA.size() - 1, RNA, basePairs, memo);
 
-    // print the max pairs and secondary struct
-    std :: cout << "Secondary structure: {";
-    for (auto it : basePairs)
-    {
-        std :: cout << '(' << it.first << ',' << it.second << "),";
-    }
+//     // print the max pairs and secondary struct
+//     std :: cout << "Secondary structure: {";
+//     for (auto it : basePairs)
+//     {
+//         std :: cout << '(' << it.first << ',' << it.second << "),";
+//     }
 
-    std :: cout << '}' << std :: endl;
-}
+//     std :: cout << '}' << std :: endl;
+// }
