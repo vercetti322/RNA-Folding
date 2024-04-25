@@ -12,7 +12,7 @@ struct Table
 
     // constructor
     Table(int size) 
-        : table(size + 1, std :: vector <int> (size + 1, 0)) { }
+        : table(size, std :: vector <int> (size, 0)) { }
 
     // value manipulation overloading
     int& operator() (int i, int j) { return table[i][j]; }
@@ -47,20 +47,28 @@ int RNAfolding(const std :: string& RNA, Table& optValue, Table& optChoice)
         {
             size_t j = i + k;
             int max = INT_MIN;
+            int choice = -1;
             int first = optValue(i, j-1);
             for(size_t t = i; t <= j - 5; t++)
             {
-                if (RNApairing(RNA, t, j) || RNApairing(RNA, j, t))
+                if (RNApairing(RNA, t, j))
                 {
-                    if(1 + optValue(i, t - 1) + optValue(t + 1, j - 1) > max){
+                    if(1 + optValue(i, t - 1) + optValue(t + 1, j - 1) > max)
+                    {
                         max = 1 + optValue(i, t - 1) + optValue(t + 1, j - 1);
+                        choice = t;
                     }
                 }
             }
 
-            if(max > first){
+            if(max > first)
+            {
                 optValue(i, j) = max;
-            } else {
+                optChoice(i, j) = choice + 1;
+            } 
+            
+            else 
+            {
                 optValue(i, j) = first;
             }
              
@@ -94,10 +102,18 @@ int main()
     // std :: vector <std :: pair <int, int>> secondaryStruct = getSecondaryStruct(optChoice, RNA);
     // print the max pairs and secondary struct
     std :: cout << "Optimal base pairs: " << max_pairs << std :: endl;
-    for (int i = 0; i < optValue.size(); i++)
+    for (int i = 0; i < optValue.size() - 5; i++)
     {
-        for (int j = 0; j < optValue.size(); j++)
+        for (int j = 5; j < optValue.size(); j++)
             std :: cout << optValue(i, j) << " ";
+        std :: cout << std :: endl;
+    }
+
+    std :: cout << std :: endl;
+    for (int i = 0; i < optChoice.size() - 5; i++)
+    {
+        for (int j = 5; j < optChoice.size(); j++)
+            std :: cout << optChoice(i, j) << " ";
         std :: cout << std :: endl;
     }
     // std :: cout << "Secondary structure: ";
