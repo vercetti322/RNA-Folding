@@ -141,7 +141,18 @@
     <b>Appropriate memoization have been done for both the algorithms (dp & backtracking one) to optimize running time!</b>
     <h3>Final output</h3>
     <p>After running the algorithms, we finally get our optimal ordering of base-pairs as:</p>
-    <code><b>S= {(1,13), (2,12), (3,11), (4,9)}</b></code>
+    <code style="font-size: 18px;"><b>S= {(1,13), (2,12), (3,11), (4,9)}</b></code>
+    <p>Following are the tables filled to reach above output</p>
+    <div>
+        <div class="choice" style="display: inline-block; margin-left: 20px; margin-right: 50px; text-align: center;">
+            <img src="./choice-table.png">
+            <p style="text-decoration: underline;"><b>optChoice table</b></p>
+        </div>
+        <div class="value" style="display: inline-block; text-align: center;">
+            <img src="./value-table.png">
+            <p style="text-decoration: underline;"><b>optValue table</b></p>
+        </div>
+    </div>      
     <h3>Complexity Analysis</h3>
     <h4>Optimal base pair Algorithm</h4>
     <ol>
@@ -153,8 +164,31 @@
     <p>Hence the running time for this algo is <b>O(n<sup>3</sup>)</b></p>
     <h4>Base pair construction Algorithm</h4>
     <p>Without memoization the algorithm will have <b>O(2<sup>n</sup>)</b> complexity, but memoizing it
-            makes the function call itself only on distinct pairs of <b>(i, j)</b>, hence in worst case it will 
-            go over all unique combinations of <b>(i, j)</b> which will make complexity quadratic as <b>O(n<sup>2</sup>)</b>
+        makes the function call itself only on distinct pairs of <b>(i, j)</b>, hence in worst case it will 
+        go over all unique combinations of <b>(i, j)</b> which will make complexity quadratic as <b>O(n<sup>2</sup>)</b>
     </p>
+    <h3>Best Practices</h3>
+    <p>Some minor things done to optimize performance:</p>
+    <ol>
+        <li>
+            Used references for complex objects which are costly to copy..
+        </li>
+        <li>
+            Used <code>const</code> at appropriate positions to preserve the container while
+            the function accesses data from it.. 
+        </li>
+        <li>
+            Memoization used which is trivial for a dp problem..
+        </li>
+    </ol>
+    <h3>References</h3>
+    <ol>
+        <li>
+            <a href="https://medium.com/@shashanksharma021401/finding-secondary-structure-of-rna-using-dynamic-programming-over-intervals-f8f1ce37ed32">Article discussing about RNA folding..</a>
+        </li>
+        <li>
+            <a href="https://www.youtube.com/watch?v=1zBbqtNqNVc&t=2433s">Video on walkthrough of Algorithm..</a>
+        </li>
+    </ol>
 </body>
 </html>

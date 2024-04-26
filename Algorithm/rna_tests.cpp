@@ -14,7 +14,8 @@
  * @brief Main function that reads RNA sequences from a file, computes their optimal secondary structures, and prints the base-pair structures.
  * @return 0 on successful execution.
  */
-int main() {
+int main() 
+{
     std::string RNA; ///< Variable to store the current RNA sequence.
     std::ifstream testFile("test_file.txt"); ///< Input file stream for the test file.
 
